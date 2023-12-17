@@ -11,6 +11,8 @@
 #include "src/Common_code/TLE8457_serial/TLE8457_serial_lib.h"
 #include "src/Common_code/TLE8457_serial/tIncomingFrameHanlder.h"
 
+#include "src/keyCodeHttp.h"
+
 Scheduler sched;
 tWatchdogProcess WatchdogProcess(sched);
 
@@ -37,13 +39,12 @@ tHttpServer HttpServer;
 extern tTelnetServer TelnetServer;
 #endif
 
+
 #if CONFIG_HTTP_SERVER
 tHttpServlet * ServletFactory(String *pRequestBuffer)
 {
-#if CONFIG_HTTP_SERVLET_OUTCONTROL_JS
-   if (pRequestBuffer->startsWith("/outputState")) return new tOutputStateServlet();
-#endif //CONFIG_HTTP_SERVLET_OUTCONTROL_JS
-   return NULL;
+//   if (pRequestBuffer->startsWith("/main")) return new tOutputStateServlet();
+   return new tDefaultPageServlet();
 }
 #endif
 
