@@ -1,0 +1,18 @@
+manifest:
+  defaults:
+    remote: szkudlik-homeAutomation
+
+  remotes:
+    - name: szkudlik-homeAutomation
+      url-base: https://github.com/szkudlik-homeAutomation
+
+  projects:
+    - name: Common_code
+      path: src/Common_code
+      repo-path: Common_code.git
+      import: 
+        path-prefix: keyCode
+      revision: 2d04cab978c5156d50c78604cfa7dc043845ade3
+
+  self:
+      path: keyCode
