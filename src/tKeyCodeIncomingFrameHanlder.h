@@ -21,5 +21,6 @@ private:
 
    void HandleMsgEepromCrcRequest(uint8_t SenderID);
    void HandleMsgEepromCrcResponse(uint8_t SenderID, tMessageTypeEepromCRCResponse* Message);
+   void HandleMsgEepromClearCodes();
 
 };

@@ -34,7 +34,12 @@ void tKeyCodeIncomingFrameHanlder::onMessage(uint8_t type, uint16_t data, void *
              DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_EEPROM_CRC_RESPONSE");
              HandleMsgEepromCrcResponse(SenderDevId,(tMessageTypeEepromCRCResponse*)(pFrame->Data));
            break;
+       case MESSAGE_TYPE_CLEAR_CODES:
+    	   	 DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_CLEAR_CODES");
+    	   	 HandleMsgEepromClearCodes();
+    	   	 break;
       }
+
 }
 
 void tKeyCodeIncomingFrameHanlder::HandleMsgEepromCrcRequest(uint8_t SenderID)
@@ -58,3 +63,7 @@ void tKeyCodeIncomingFrameHanlder::HandleMsgEepromCrcResponse(uint8_t SenderID, 
 	LOG(println(Message->EepromCRC,DEC));
 }
 
+void tKeyCodeIncomingFrameHanlder::HandleMsgEepromClearCodes()
+{
+	  EEPROM.write(KEY_CODE_TABLE_USAGE_OFFSET, 0);
+}

@@ -89,3 +89,8 @@ typedef struct
   uint16_t DefTimerValue; // default timer. 0 means there's no timer (set forever)
 } tMessageTypeDefaultTimerResponse;
 
+/**
+ * Erase all codes - clear Eeprom codes  map, all codes need to be re-programmed
+ * for keyCode
+ */
+#define MESSAGE_TYPE_CLEAR_CODES 0x80
