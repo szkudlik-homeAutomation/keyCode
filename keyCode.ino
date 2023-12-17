@@ -24,7 +24,7 @@ void COMM_SERIAL_EVENT() {
 #if CONFIG_NETWORK
 
 tNetwork Network;
-tTcpServerProcess TcpServerProcess(sched, TCP_WATCHDOG_TIMEOUT);
+tTcpServerProcess TcpServerProcess(sched, 0);	// watchdog disabled
 
 #if CONFIG_HTTP_SERVER
 tHttpServer HttpServer;
