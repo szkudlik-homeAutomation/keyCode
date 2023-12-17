@@ -21,12 +21,13 @@
 #define CONFIG_TELNET_SERVER 1
 #define CONFIG_WATCHDOG 1
 
-#define CONFIG_TLE8457_COMM_LIB 0
+#define CONFIG_TLE8457_COMM_LIB 1
 
 #include <Arduino.h>
 #include "src/Common_code/helpers.h"
 #include "GlobalDefs/version.h"
 #include "GlobalDefs/Eeprom.h"
 #include "GlobalDefs/CommDefs.h"
+#include "GlobalDefs/TLE8457_serial_lib_defs.h"
 #include "src/Common_code/debug.h"
 #include "src/Common_code/status.h"

@@ -8,6 +8,9 @@
 #include "src/Common_code/Network/servlets/servlets.h"
 #include "src/Common_code/WatchdogProcess.h"
 
+#include "src/Common_code/TLE8457_serial/TLE8457_serial_lib.h"
+#include "src/Common_code/TLE8457_serial/tIncomingFrameHanlder.h"
+
 Scheduler sched;
 tWatchdogProcess WatchdogProcess(sched);
 
