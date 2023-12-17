@@ -10,6 +10,7 @@
 
 #include "src/Common_code/TLE8457_serial/TLE8457_serial_lib.h"
 #include "src/Common_code/TLE8457_serial/tIncomingFrameHanlder.h"
+#include "src/tKeyCodeIncomingFrameHanlder.h"
 
 #include "src/keyCodeHttp.h"
 
@@ -18,6 +19,7 @@ tWatchdogProcess WatchdogProcess(sched);
 
 #if CONFIG_TLE8457_COMM_LIB
 tIncomingFrameHanlder IncomingFrameHandler;
+tKeyCodeIncomingFrameHanlder KeyCodeIncomingFrameHandler;
 CommRecieverProcess CommReciever(sched,EEPROM.read(EEPROM_DEVICE_ID_OFFSET));
 CommSenderProcess CommSender(sched,EEPROM.read(EEPROM_DEVICE_ID_OFFSET),EEPROM.read(EEPROM_DEVICE_ID_OFFSET));
 
