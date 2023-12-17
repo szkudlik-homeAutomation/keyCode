@@ -23,6 +23,10 @@
 
 #define CONFIG_TLE8457_COMM_LIB 1
 
+#define KEY_CODE_BIT_SIZE 36
+#define KEY_MAX_DIGITS 5
+
+
 #include <Arduino.h>
 #include "src/Common_code/helpers.h"
 #include "GlobalDefs/version.h"
