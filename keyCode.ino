@@ -33,21 +33,8 @@ void COMM_SERIAL_EVENT() {
 tNetwork Network;
 tTcpServerProcess TcpServerProcess(sched, 0);	// watchdog disabled
 
-#if CONFIG_HTTP_SERVER
-tHttpServer HttpServer;
-#endif
-
 #if CONFIG_TELNET_SERVER
 extern tTelnetServer TelnetServer;
-#endif
-
-
-#if CONFIG_HTTP_SERVER
-tHttpServlet * ServletFactory(String *pRequestBuffer)
-{
-//   if (pRequestBuffer->startsWith("/main")) return new tOutputStateServlet();
-   return new tDefaultPageServlet();
-}
 #endif
 
 #endif // CONFIG_NETWORK

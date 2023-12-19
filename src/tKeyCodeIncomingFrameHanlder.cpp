@@ -34,6 +34,7 @@ void tKeyCodeIncomingFrameHanlder::onMessage(uint8_t type, uint16_t data, void *
              DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_EEPROM_CRC_RESPONSE");
              HandleMsgEepromCrcResponse(SenderDevId,(tMessageTypeEepromCRCResponse*)(pFrame->Data));
            break;
+
        case MESSAGE_TYPE_CLEAR_CODES:
     	   	 DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_CLEAR_CODES");
     	   	 HandleMsgEepromClearCodes();
