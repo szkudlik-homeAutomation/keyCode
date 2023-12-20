@@ -11,6 +11,7 @@
 #include "src/Common_code/TLE8457_serial/TLE8457_serial_lib.h"
 #include "src/Common_code/TLE8457_serial/tIncomingFrameHanlder.h"
 #include "src/tKeyCodeIncomingFrameHanlder.h"
+#include "src/tKeyReciever.h"
 
 #include "src/Common_code/sensors/tSensor.h"
 #include "src/Common_code/sensors/tWiegandSensor.h"
@@ -22,6 +23,7 @@ tWatchdogProcess WatchdogProcess(sched);
 tSensorProcess SensorProcess(sched);
 
 tWiegandSensor WiegandSensor(WIEGAND_SENSOR_ID);
+tKeyReciever KeyReciever;
 
 #if CONFIG_TLE8457_COMM_LIB
 tIncomingFrameHanlder IncomingFrameHandler;
