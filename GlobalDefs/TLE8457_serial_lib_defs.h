@@ -9,22 +9,7 @@
  */
 
 //TODO
-
-//#if CONFIG_CENTRAL_NODE
-//  #define OUTPUT_QUEUE_SIZE 140
-//
-//  #define COMM_SERIAL Serial1
-//  #define COMM_SERIAL_EVENT serialEvent1
-//
-//#else
-  #define OUTPUT_QUEUE_SIZE 3
-
-//  #define COMM_SERIAL Serial
-//  #define COMM_SERIAL_EVENT serialEvent
-  #define COMM_SERIAL Serial1
-  #define COMM_SERIAL_EVENT serialEvent1
-//
-//#endif
+#define OUTPUT_QUEUE_SIZE 3
 
 /**
  * MAX_TRANSMIT_DELAY

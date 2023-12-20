@@ -7,8 +7,23 @@
 
 #pragma once
 
+#ifdef __AVR_ATmega2560__
+#define CONFIG_DEBUG_NODE 1
+#elif __AVR_ATmega328P__
+#else
+#error unknown board
+#endif
+
+#if CONFIG_DEBUG_NODE
 #define COMM_SERIAL Serial1
 #define COMM_SERIAL_EVENT serialEvent1
+#else // CONFIG_DEBUG_NODE
+#define COMM_SERIAL Serial
+#define COMM_SERIAL_EVENT serialEvent
+#endif // CONFIG_DEBUG_NODE
+
+
+#if CONFIG_DEBUG_NODE
 
 #define CONFIG_LOGGER 1
 
@@ -17,10 +32,17 @@
 #define DEBUG_SERIAL_EVENT serialEvent
 
 #define CONFIG_NETWORK 1
-#define CONFIG_HTTP_SERVER 0
 #define CONFIG_TELNET_SERVER 1
-#define CONFIG_WATCHDOG 1
 
+#define CONFIG_HTTP_SERVER 0
+#define CONFIG_SENSOR_HUB 0
+#define CONFIG_SENSORS_JSON_OUTPUT 0
+
+#else // CONFIG_DEBUG_NODE
+#define CONFIG_LOGGER 0
+#endif // CONFIG_DEBUG_NODE
+
+#define CONFIG_WATCHDOG 1
 #define CONFIG_TLE8457_COMM_LIB 1
 
 #define KEY_CODE_BIT_SIZE 36
