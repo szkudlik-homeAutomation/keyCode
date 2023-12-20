@@ -12,10 +12,16 @@
 #include "src/Common_code/TLE8457_serial/tIncomingFrameHanlder.h"
 #include "src/tKeyCodeIncomingFrameHanlder.h"
 
+#include "src/Common_code/sensors/tSensor.h"
+#include "src/Common_code/sensors/tWiegandSensor.h"
+
 #include "src/keyCodeHttp.h"
 
 Scheduler sched;
 tWatchdogProcess WatchdogProcess(sched);
+tSensorProcess SensorProcess(sched);
+
+tWiegandSensor WiegandSensor(WIEGAND_SENSOR_ID);
 
 #if CONFIG_TLE8457_COMM_LIB
 tIncomingFrameHanlder IncomingFrameHandler;
@@ -70,12 +76,21 @@ void setup() {
 #endif // CONFIG_NETWORK
 
   WatchdogProcess.add(true);
+  SensorProcess.add(true);
 
 #ifdef DEBUG_SERIAL
   DEBUG_SERIAL.print(F("Free RAM: "));
   DEBUG_SERIAL.println(getFreeRam());
   DEBUG_SERIAL.println(F("SYSTEM INITIALIZED"));
 #endif
+
+#define WIEGAND_SENSOR_ID 1
+
+	WiegandSensor.Config.PinD0 = CONFIG_WIEGAND_D0_PIN;
+	WiegandSensor.Config.PinD1 = CONFIG_WIEGAND_D1_PIN;
+
+	WiegandSensor.setConfig(1);	// 100ms measure period
+	WiegandSensor.Start();
 }
 
 void loop() {

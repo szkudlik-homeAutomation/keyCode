@@ -12,7 +12,7 @@ manifest:
       repo-path: Common_code.git
       import: 
         path-prefix: keyCode
-      revision: 9f08acab9999d239080bdeec72bfd40496b35957
+      revision: 8ea18a807e476c5b99e59247643b32961f3dc827
 
   self:
       path: keyCode

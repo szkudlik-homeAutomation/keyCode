@@ -48,6 +48,14 @@
 #define KEY_CODE_BIT_SIZE 36
 #define KEY_MAX_DIGITS 5
 
+#define CONFIG_SENSORS 1
+#define CONFIG_SENSOR_GENERATE_EVENTS 1
+#define CONFIG_WIEGAND_SENSOR 1
+
+#define WIEGAND_SENSOR_ID 1
+#define CONFIG_WIEGAND_D0_PIN 2
+#define CONFIG_WIEGAND_D1_PIN 3
+
 
 #include <Arduino.h>
 #include "src/Common_code/helpers.h"
