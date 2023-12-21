@@ -23,7 +23,7 @@ tWatchdogProcess WatchdogProcess(sched);
 tSensorProcess SensorProcess(sched);
 
 tWiegandSensor WiegandSensor(WIEGAND_SENSOR_ID);
-tKeyReciever KeyReciever;
+tKeyReciever KeyReciever(sched);
 
 #if CONFIG_TLE8457_COMM_LIB
 tIncomingFrameHanlder IncomingFrameHandler;
@@ -79,6 +79,7 @@ void setup() {
 
   WatchdogProcess.add(true);
   SensorProcess.add(true);
+  KeyReciever.add(false);
 
 #ifdef DEBUG_SERIAL
   DEBUG_SERIAL.print(F("Free RAM: "));
