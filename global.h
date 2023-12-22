@@ -55,7 +55,7 @@
 #define WIEGAND_SENSOR_ID 1
 #define CONFIG_WIEGAND_D0_PIN 2
 #define CONFIG_WIEGAND_D1_PIN 3
-#define CONFIG_KEYCODE_TIMEOUT 3000
+#define CONFIG_KEYCODE_TIMEOUT 2500
 
 #include <Arduino.h>
 #include "src/Common_code/helpers.h"
