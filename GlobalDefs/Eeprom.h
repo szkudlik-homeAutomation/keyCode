@@ -11,11 +11,8 @@
 typedef struct tKeyCode
 {
 	uint8_t Id;			// id of the code
-	uint8_t TypeLength; // if 0 - a dongle bitmap. if > 0 - number of key digits
-	union {
-		uint8_t DongleBitmap[KEY_CODE_BYTE_SIZE];
-		uint8_t CodeDigits[KEY_MAX_DIGITS];
-	};
+	uint8_t type;		// code type, 0 - a dongle, 1 - keySequence
+	uint32_t code;		// a code in binary format, either
 
 	uint16_t ValidStart;	// valid onlt between start-end. If 0 - valid always.
 	uint16_t ValidEnd;		// start-end is a time code from the central node
@@ -34,6 +31,7 @@ typedef struct __tEeprom
   uint8_t DNS[4];
   uint8_t MAC[6];
 #endif CONFIG_NETWORK
+  uint8_t MinKeycodeLength;
   uint8_t KeyCodeUsage;
   tKeyCode KeyCode[KEY_CODE_TABLE_SIZE];
 };
@@ -50,7 +48,10 @@ typedef struct __tEeprom
 #define EEPROM_MAC offsetof(__tEeprom,MAC[0])
 #endif //CONFIG_NETWORK
 
+#define MIN_KEYCODE_LEN_OFFSET offsetof(__tEeprom,MinKeycodeLength)
 #define KEY_CODE_TABLE_USAGE_OFFSET offsetof(__tEeprom,KeyCodeUsage)
 #define KEY_CODE_TABLE_OFFSET offsetof(__tEeprom,KeyCode[0])
+#define KEY_CODE_TABLE_SIZE sizeof(tKeyCode)
+
 
 void SetDefaultEEPromValues();

@@ -27,7 +27,7 @@ public:
 
 private:
    uint8_t  mDigitsCollected;        // number of collected digits. Goes back to 0 if a dongle is read or when timeout
-   uint8_t  mDigits[KEY_MAX_DIGITS];
+   uint32_t mDigitsCode;             // a code, in 32bit format
 
    static const uint8_t key_type_digit = 4;
    static const uint8_t key_type_dongle = 34;
@@ -35,11 +35,12 @@ private:
    void deletePendingKeyCode();
    void deleteTimeout() { disable(); }
 
-   void hanldeDongleCode(uint32_t code);
+   void handleCode(uint32_t code, uint8_t type);
    void handleDigit(uint32_t code);
-   void handleCompletedDigitCode();
 
    void sendIncorrectCodeEvent();
-   void sendMatchCodeEvent();
+   void sendMatchCodeEvent(tKeyCode *pValidCode);
+
+   uint8_t findKeyTableEntry(tKeyCode *keyCodeEntry, uint8_t TypeLength, uint32_t code);
 };
 

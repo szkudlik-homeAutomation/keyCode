@@ -30,7 +30,8 @@ void tKeyReciever::onMessage(uint8_t type, uint16_t data, void *pData)
    switch (pResult->type)
    {
    case key_type_dongle:
-	   hanldeDongleCode(pResult->code);	// independent from keys - may be in the middle of key sequence
+	   handleCode(pResult->code, key_type_dongle);	// independent from keys - may be in the middle of key sequence
+  	   deletePendingKeyCode();
 	   break;
 
    case key_type_digit:
@@ -42,7 +43,6 @@ void tKeyReciever::onMessage(uint8_t type, uint16_t data, void *pData)
 	   deletePendingKeyCode();	// error
    }
 }
-
 
 void tKeyReciever::setTimeout()
 {
@@ -64,6 +64,7 @@ void tKeyReciever::deletePendingKeyCode()
 {
 	deleteTimeout();
 	mDigitsCollected = 0;
+	mDigitsCode = 0;
 }
 
 void tKeyReciever::sendIncorrectCodeEvent()
@@ -71,16 +72,11 @@ void tKeyReciever::sendIncorrectCodeEvent()
 	DEBUG_PRINTLN_3("INCORRECT CODE - event sent");
 }
 
-void tKeyReciever::sendMatchCodeEvent()
+void tKeyReciever::sendMatchCodeEvent(tKeyCode *pValidCode)
 {
 	DEBUG_PRINTLN_3("CODE ACCEPTED - event sent");
 }
 
-
-void tKeyReciever::hanldeDongleCode(uint32_t code)
-{
-	DEBUG_PRINTLN_3("DONGLE CODE");
-}
 
 void tKeyReciever::handleDigit(uint32_t code)
 {
@@ -91,7 +87,8 @@ void tKeyReciever::handleDigit(uint32_t code)
 	}
 	if (code == 0xD)
 	{
-		handleCompletedDigitCode();
+	    handleCode(mDigitsCode, key_type_digit);
+		deletePendingKeyCode();
 		return;
 	}
 	if (mDigitsCollected >= KEY_MAX_DIGITS)
@@ -101,11 +98,25 @@ void tKeyReciever::handleDigit(uint32_t code)
 		return;
 	}
 
-	mDigits[mDigitsCollected++] = code;
+	mDigitsCode += code * 10^mDigitsCollected;
 }
 
-void tKeyReciever::handleCompletedDigitCode()
+void tKeyReciever::handleCode(uint32_t code, uint8_t type)
 {
-	DEBUG_PRINTLN_3("DIGIT CODE");
-	deletePendingKeyCode();
+	uint8_t NumOfEnties = EEPROM.read(KEY_CODE_TABLE_USAGE_OFFSET);
+	for (uint8_t i = 0; i < NumOfEnties; i++)
+	{
+		tKeyCode ValidCode;
+		EEPROM.get(KEY_CODE_TABLE_OFFSET+(KEY_CODE_TABLE_SIZE*i),ValidCode);
+		if (ValidCode.type != type)
+			continue;
+		if (ValidCode.code != code)
+			continue;
+
+		// TODO - additional checks, timings, etc.
+		sendMatchCodeEvent(&ValidCode);
+		return;
+	}
+
+	sendIncorrectCodeEvent();
 }

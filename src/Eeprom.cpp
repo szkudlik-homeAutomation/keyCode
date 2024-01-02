@@ -32,6 +32,8 @@ void SetDefaultEEPromValues()
   EEPROM.write(EEPROM_MAC+5,0x15);
 #endif //CONFIG_NETWORK
 
+
+  EEPROM.write(MIN_KEYCODE_LEN_OFFSET, 4);
   EEPROM.write(KEY_CODE_TABLE_USAGE_OFFSET, 0);
 
 }
