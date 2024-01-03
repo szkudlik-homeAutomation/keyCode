@@ -72,7 +72,7 @@ void tKeyReciever::sendIncorrectCodeEvent()
 	DEBUG_PRINTLN_3("INCORRECT CODE - event sent");
 }
 
-void tKeyReciever::sendMatchCodeEvent(tKeyCode *pValidCode)
+void tKeyReciever::sendMatchCodeEvent(tMessageTypeAddCode *pValidCode)
 {
 	DEBUG_PRINTLN_3("CODE ACCEPTED - event sent");
 }
@@ -106,7 +106,7 @@ void tKeyReciever::handleCode(uint32_t code, uint8_t type)
 	uint8_t NumOfEnties = EEPROM.read(KEY_CODE_TABLE_USAGE_OFFSET);
 	for (uint8_t i = 0; i < NumOfEnties; i++)
 	{
-		tKeyCode ValidCode;
+		tMessageTypeAddCode ValidCode;
 		EEPROM.get(KEY_CODE_TABLE_OFFSET+(KEY_CODE_TABLE_SIZE*i),ValidCode);
 		if (ValidCode.type != type)
 			continue;

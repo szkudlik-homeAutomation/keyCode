@@ -39,8 +39,6 @@ private:
    void handleDigit(uint32_t code);
 
    void sendIncorrectCodeEvent();
-   void sendMatchCodeEvent(tKeyCode *pValidCode);
-
-   uint8_t findKeyTableEntry(tKeyCode *keyCodeEntry, uint8_t TypeLength, uint32_t code);
+   void sendMatchCodeEvent(tMessageTypeAddCode *pValidCode);
 };
 
