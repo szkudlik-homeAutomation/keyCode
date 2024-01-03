@@ -113,8 +113,14 @@ void tKeyReciever::handleDigit(uint32_t code)
 		deletePendingKeyCode();
 		return;
 	}
-
-	mDigitsCode += code * 10^mDigitsCollected;
+	uint32_t codePow = code;
+	uint8_t i = KEY_MAX_DIGITS - mDigitsCollected - 1;
+	while(i--)
+	{
+		codePow *= 10;
+	}
+	mDigitsCode += codePow;
+	mDigitsCollected++;
 }
 
 void tKeyReciever::handleCode(uint32_t code, uint8_t type)
