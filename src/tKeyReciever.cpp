@@ -9,6 +9,7 @@
 #include "tKeyReciever.h"
 #include "Common_code/tTimestamp.h"
 #include "Common_code/sensors/tWiegandSensor.h"
+#include "Common_code/TLE8457_serial/TLE8457_serial_lib.h"
 
 void tKeyReciever::onMessage(uint8_t type, uint16_t data, void *pData)
 {
@@ -71,11 +72,25 @@ void tKeyReciever::deletePendingKeyCode()
 void tKeyReciever::sendIncorrectCodeEvent()
 {
 	DEBUG_PRINTLN_3("INCORRECT CODE - event sent");
+
+	tMessageTypeButtonPress Msg;
+    Msg.DoubleClick = 0xFFFF;
+    Msg.ForceSrcId = 0;
+    Msg.LongClick = 0;
+    Msg.ShortClick = 0;
+    CommSenderProcess::Instance->Enqueue(DEVICE_ID_BROADCAST,MESSAGE_BUTTON_PRESS,sizeof(Msg),&Msg);
 }
 
 void tKeyReciever::sendMatchCodeEvent(tMessageTypeAddCode *pValidCode)
 {
 	DEBUG_PRINTLN_3("CODE ACCEPTED - event sent");
+
+    tMessageTypeButtonPress Msg;
+    Msg.DoubleClick = 0;
+    Msg.ForceSrcId = 0;
+    Msg.LongClick = 0;
+    Msg.ShortClick = pValidCode->ButtonBitmap;
+    CommSenderProcess::Instance->Enqueue(DEVICE_ID_BROADCAST,MESSAGE_BUTTON_PRESS,sizeof(Msg),&Msg);
 }
 
 
