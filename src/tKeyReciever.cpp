@@ -7,6 +7,7 @@
 
 
 #include "tKeyReciever.h"
+#include "Common_code/tTimestamp.h"
 #include "Common_code/sensors/tWiegandSensor.h"
 
 void tKeyReciever::onMessage(uint8_t type, uint16_t data, void *pData)
@@ -113,7 +114,17 @@ void tKeyReciever::handleCode(uint32_t code, uint8_t type)
 		if (ValidCode.code != code)
 			continue;
 
-		// TODO - additional checks, timings, etc.
+		if (ValidCode.ValidStart && ValidCode.ValidEnd)
+		{
+		    uint16_t ts = tTimestamp::get();
+		    ts = ts >> 8;   // eldest 8 bits
+
+		    if (ValidCode.ValidStart > ts)
+                continue;
+            if (ValidCode.ValidEnd < ts)
+                continue;
+		}
+
 		sendMatchCodeEvent(&ValidCode);
 		return;
 	}
