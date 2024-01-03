@@ -16,8 +16,6 @@
 #include "src/Common_code/sensors/tSensor.h"
 #include "src/Common_code/sensors/tWiegandSensor.h"
 
-#include "src/keyCodeHttp.h"
-
 Scheduler sched;
 tWatchdogProcess WatchdogProcess(sched);
 tSensorProcess SensorProcess(sched);
@@ -43,6 +41,14 @@ tTcpServerProcess TcpServerProcess(sched, 0);	// watchdog disabled
 
 #if CONFIG_TELNET_SERVER
 extern tTelnetServer TelnetServer;
+#endif
+#if CONFIG_HTTP_SERVER
+tHttpServer HttpServer;
+
+tHttpServlet * ServletFactory(String *pRequestBuffer)
+{
+   return new tTimestampServlet();  // servlet for debug testing only
+}
 #endif
 
 #endif // CONFIG_NETWORK

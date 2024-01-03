@@ -7,6 +7,10 @@
 
 #pragma once
 
+
+//#define CONFIG_DEBUG_NODE 1     //!!!!!!
+
+
 #ifdef __AVR_ATmega2560__
 #define CONFIG_DEBUG_NODE 1
 #elif __AVR_ATmega328P__
@@ -33,8 +37,9 @@
 
 #define CONFIG_NETWORK 1
 #define CONFIG_TELNET_SERVER 1
+#define CONFIG_HTTP_SERVER 1
+#define CONFIG_TIMESTAMP_SERVLET 1
 
-#define CONFIG_HTTP_SERVER 0
 #define CONFIG_SENSOR_HUB 0
 #define CONFIG_SENSORS_JSON_OUTPUT 0
 
@@ -56,6 +61,8 @@
 #define CONFIG_WIEGAND_D0_PIN 2
 #define CONFIG_WIEGAND_D1_PIN 3
 #define CONFIG_KEYCODE_TIMEOUT 2500
+
+#define CONFIG_TIMESTAMP 1
 
 #include <Arduino.h>
 #include "src/Common_code/helpers.h"
