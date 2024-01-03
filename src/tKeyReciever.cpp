@@ -119,7 +119,14 @@ void tKeyReciever::handleDigit(uint32_t code)
 
 void tKeyReciever::handleCode(uint32_t code, uint8_t type)
 {
-	uint8_t NumOfEnties = EEPROM.read(KEY_CODE_TABLE_USAGE_OFFSET);
+    DEBUG_PRINT_3("Processing code type");
+    DEBUG_3(print(type, DEC));
+    DEBUG_PRINT_3(" value: ");
+    DEBUG_3(print(code, DEC));
+    DEBUG_PRINT_3(" 0x");
+    DEBUG_3(println(code, HEX));
+
+    uint8_t NumOfEnties = EEPROM.read(KEY_CODE_TABLE_USAGE_OFFSET);
 	for (uint8_t i = 0; i < NumOfEnties; i++)
 	{
 		tMessageTypeAddCode ValidCode;
