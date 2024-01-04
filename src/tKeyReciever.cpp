@@ -69,11 +69,12 @@ void tKeyReciever::handleFrameRecieved(uint16_t data, void *pData)
           DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_EEPROM_CRC_REQUEST");
           HandleMsgEepromCrcRequest(SenderDevId);
           break;
-
+#if CONFIG_DEBUG_NODE
     case MESSAGE_TYPE_EEPROM_CRC_RESPONSE:
           DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_EEPROM_CRC_RESPONSE");
           HandleMsgEepromCrcResponse(SenderDevId,(tMessageTypeEepromCRCResponse*)(pFrame->Data));
           break;
+#endif // CONFIG_DEBUG_NODE
 
     case MESSAGE_TYPE_CLEAR_CODES:
           DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_CLEAR_CODES");
@@ -98,6 +99,7 @@ void tKeyReciever::HandleMsgEepromCrcRequest(uint8_t SenderID)
   CommSenderProcess::Instance->Enqueue(SenderID,MESSAGE_TYPE_EEPROM_CRC_RESPONSE,sizeof(Msg), &Msg);
 }
 
+#if CONFIG_DEBUG_NODE
 void tKeyReciever::HandleMsgEepromCrcResponse(uint8_t SenderID, tMessageTypeEepromCRCResponse* Message)
 {
     LOG_PRINT("Eeprom CRC for device ");
@@ -107,6 +109,7 @@ void tKeyReciever::HandleMsgEepromCrcResponse(uint8_t SenderID, tMessageTypeEepr
     LOG_PRINT(" CRC=");
     LOG(println(Message->EepromCRC,DEC));
 }
+#endif CONFIG_DEBUG_NODE
 
 void tKeyReciever::HandleMsgEepromClearCodes()
 {

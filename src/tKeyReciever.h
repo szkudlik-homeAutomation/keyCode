@@ -34,7 +34,11 @@ private:
    void handleFrameRecieved(uint16_t data, void *pData);
 
    void HandleMsgEepromCrcRequest(uint8_t SenderID);
+
+#if CONFIG_DEBUG_NODE
    void HandleMsgEepromCrcResponse(uint8_t SenderID, tMessageTypeEepromCRCResponse* Message);
+#endif CONFIG_DEBUG_NODE
+
    void HandleMsgEepromClearCodes();
 
    static const uint8_t key_type_digit = 4;
