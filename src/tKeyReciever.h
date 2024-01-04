@@ -40,6 +40,8 @@ private:
 #endif CONFIG_DEBUG_NODE
 
    void HandleMsgEepromClearCodes();
+   void HandleMsgAddCode(uint8_t SenderDevId, tMessageTypeAddCode *Msg);
+   void HandleMsgTriggerCode(tMessageTypeTriggerCode *Msg);
 
    static const uint8_t key_type_digit = 4;
    static const uint8_t key_type_dongle = 34;

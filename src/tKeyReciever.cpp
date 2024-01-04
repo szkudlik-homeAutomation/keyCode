@@ -10,6 +10,7 @@
 #include "Common_code/tTimestamp.h"
 #include "Common_code/sensors/tWiegandSensor.h"
 #include "Common_code/TLE8457_serial/TLE8457_serial_lib.h"
+#include "Common_code/TLE8457_serial/tOutgoingFrames.h"
 
 void tKeyReciever::onMessage(uint8_t type, uint16_t data, void *pData)
 {
@@ -82,8 +83,10 @@ void tKeyReciever::handleFrameRecieved(uint16_t data, void *pData)
           break;
 
     case MESSAGE_TYPE_ADD_CODE:
+        HandleMsgAddCode(SenderDevId, (tMessageTypeAddCode*)(pFrame->Data));
         break;
     case MESSAGE_TYPE_TRIGGER_CODE:
+        HandleMsgTriggerCode((tMessageTypeTriggerCode *)(pFrame->Data));
         break;
 
     }
@@ -110,11 +113,6 @@ void tKeyReciever::HandleMsgEepromCrcResponse(uint8_t SenderID, tMessageTypeEepr
     LOG(println(Message->EepromCRC,DEC));
 }
 #endif CONFIG_DEBUG_NODE
-
-void tKeyReciever::HandleMsgEepromClearCodes()
-{
-      EEPROM.write(KEY_CODE_TABLE_USAGE_OFFSET, 0);
-}
 
 void tKeyReciever::setTimeout()
 {
@@ -203,29 +201,73 @@ void tKeyReciever::handleCode(uint32_t code, uint8_t type)
     DEBUG_3(println(code, HEX));
 
     uint8_t NumOfEnties = EEPROM.read(KEY_CODE_TABLE_USAGE_OFFSET);
-	for (uint8_t i = 0; i < NumOfEnties; i++)
-	{
-		tMessageTypeAddCode ValidCode;
-		EEPROM.get(KEY_CODE_TABLE_OFFSET+(KEY_CODE_TABLE_SIZE*i),ValidCode);
-		if (ValidCode.type != type)
-			continue;
-		if (ValidCode.code != code)
-			continue;
 
-		if (ValidCode.ValidStart && ValidCode.ValidEnd)
-		{
-		    uint16_t ts = tTimestamp::get();
-		    ts = ts >> 8;   // eldest 8 bits
-
-		    if (ValidCode.ValidStart > ts)
+    if (NumOfEnties > 0)
+    {
+        for (uint8_t i = 0; i < NumOfEnties; i++)
+        {
+            tMessageTypeAddCode ValidCode;
+            EEPROM.get(KEY_CODE_TABLE_OFFSET+(KEY_CODE_TABLE_SIZE*i),ValidCode);
+            if (ValidCode.type != type)
                 continue;
-            if (ValidCode.ValidEnd < ts)
+            if (ValidCode.code != code)
                 continue;
-		}
 
-		sendMatchCodeEvent(&ValidCode);
-		return;
+            if (ValidCode.ValidStart && ValidCode.ValidEnd)
+            {
+                uint16_t ts = tTimestamp::get();
+                ts = ts >> 8;   // eldest 8 bits
+
+                if (ValidCode.ValidStart > ts)
+                    continue;
+                if (ValidCode.ValidEnd < ts)
+                    continue;
+            }
+
+            sendMatchCodeEvent(&ValidCode);
+            return;
+        }
 	}
 
 	sendIncorrectCodeEvent();
 }
+
+void tKeyReciever::HandleMsgAddCode(uint8_t SenderDevId, tMessageTypeAddCode *Msg)
+{
+    DEBUG_PRINT_3("Adding code type");
+    DEBUG_3(print(Msg->type, DEC));
+    DEBUG_PRINT_3(" value: ");
+    DEBUG_3(print(Msg->code, DEC));
+    DEBUG_PRINT_3(" 0x");
+    DEBUG_3(println(Msg->code, HEX));
+    DEBUG_PRINT_3("  Valid start: ");
+    DEBUG_3(print(Msg->ValidStart, DEC));
+    DEBUG_PRINT_3("valid end: ");
+    DEBUG_3(println(Msg->ValidEnd, DEC));
+    DEBUG_PRINT_3("  MessageKeyMap: ");
+    DEBUG_3(println(Msg->ButtonBitmap, BIN));
+
+    uint8_t NumOfEnties = EEPROM.read(KEY_CODE_TABLE_USAGE_OFFSET);
+
+    if (KEY_CODE_TABLE_SIZE >= NumOfEnties)
+    {
+        // out of eeprom
+        tOutgoingFrames::SendMsgStatus(SenderDevId, STATUS_OUT_OF_MEMORY);
+        return;
+    }
+    EEPROM.get(KEY_CODE_TABLE_OFFSET+(KEY_CODE_TABLE_SIZE*NumOfEnties),Msg);
+
+    NumOfEnties++;
+    EEPROM.write(KEY_CODE_TABLE_USAGE_OFFSET, NumOfEnties);
+}
+
+void tKeyReciever::HandleMsgTriggerCode(tMessageTypeTriggerCode *Msg)
+{
+    handleCode(Msg->code, Msg->type);
+}
+
+void tKeyReciever::HandleMsgEepromClearCodes()
+{
+      EEPROM.write(KEY_CODE_TABLE_USAGE_OFFSET, 0);
+}
+
