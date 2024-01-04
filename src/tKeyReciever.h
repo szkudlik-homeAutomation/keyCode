@@ -18,6 +18,7 @@ public:
 	    tMessageReciever()
    	   {
 	    	RegisterMessageType(MessageType_SensorEvent);
+            RegisterMessageType(MessageType_SerialFrameRecieved);
 	    	deletePendingKeyCode();
    	   }
 
@@ -28,6 +29,13 @@ public:
 private:
    uint8_t  mDigitsCollected;        // number of collected digits. Goes back to 0 if a dongle is read or when timeout
    uint32_t mDigitsCode;             // a code, in 32bit format
+
+   void handleSensorEvent(uint16_t data, void *pData);
+   void handleFrameRecieved(uint16_t data, void *pData);
+
+   void HandleMsgEepromCrcRequest(uint8_t SenderID);
+   void HandleMsgEepromCrcResponse(uint8_t SenderID, tMessageTypeEepromCRCResponse* Message);
+   void HandleMsgEepromClearCodes();
 
    static const uint8_t key_type_digit = 4;
    static const uint8_t key_type_dongle = 34;

@@ -13,37 +13,104 @@
 
 void tKeyReciever::onMessage(uint8_t type, uint16_t data, void *pData)
 {
-   uint8_t SensorID = data;
-   if (type != MessageType_SensorEvent)
-	   return;
-   if (SensorID != WIEGAND_SENSOR_ID)
-	   return;
+    switch (type)
+    {
+    case MessageType_SensorEvent:
+        handleSensorEvent(data, pData);
+        break;
 
-   tSensorEvent *pSensorEvent = (tSensorEvent *)pData;
-   if (pSensorEvent->EventType != EV_TYPE_MEASUREMENT_COMPLETED)
-	   return;
+    case MessageType_SerialFrameRecieved:
+        handleFrameRecieved(data, pData);
+        break;
+    }
+}
 
-   tWiegandSensor::tResult *pResult = (tWiegandSensor::tResult *)pSensorEvent->pDataBlob;
-   DEBUG_PRINT_3("Key reciever event, key type: ");
-   DEBUG_3(print(pResult->type, DEC));
-   DEBUG_PRINT_3(" value: ");
-   DEBUG_3(println(pResult->code, HEX));
+void tKeyReciever::handleSensorEvent(uint16_t data, void *pData)
+{
+    uint8_t SensorID = data;
+    if (SensorID != WIEGAND_SENSOR_ID)
+        return;
 
-   switch (pResult->type)
-   {
-   case key_type_dongle:
-	   handleCode(pResult->code, key_type_dongle);	// independent from keys - may be in the middle of key sequence
-  	   deletePendingKeyCode();
-	   break;
+    tSensorEvent *pSensorEvent = (tSensorEvent *)pData;
+    if (pSensorEvent->EventType != EV_TYPE_MEASUREMENT_COMPLETED)
+        return;
 
-   case key_type_digit:
-	   setTimeout();
-	   handleDigit(pResult->code);
-	   break;
+    tWiegandSensor::tResult *pResult = (tWiegandSensor::tResult *)pSensorEvent->pDataBlob;
+    DEBUG_PRINT_3("Key reciever event, key type: ");
+    DEBUG_3(print(pResult->type, DEC));
+    DEBUG_PRINT_3(" value: ");
+    DEBUG_3(println(pResult->code, HEX));
 
-   default:
-	   deletePendingKeyCode();	// error
-   }
+    switch (pResult->type)
+    {
+    case key_type_dongle:
+        handleCode(pResult->code, key_type_dongle);  // independent from keys - may be in the middle of key sequence
+        deletePendingKeyCode();
+        break;
+
+    case key_type_digit:
+        setTimeout();
+        handleDigit(pResult->code);
+        break;
+
+    default:
+        deletePendingKeyCode();  // error
+    }
+}
+
+void tKeyReciever::handleFrameRecieved(uint16_t data, void *pData)
+{
+    tCommunicationFrame *pFrame = (tCommunicationFrame *)pData;
+    uint8_t SenderDevId = pFrame->SenderDevId;
+
+    switch (data)   // messageType
+    {
+    case MESSAGE_TYPE_EEPROM_CRC_REQUEST:
+          DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_EEPROM_CRC_REQUEST");
+          HandleMsgEepromCrcRequest(SenderDevId);
+          break;
+
+    case MESSAGE_TYPE_EEPROM_CRC_RESPONSE:
+          DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_EEPROM_CRC_RESPONSE");
+          HandleMsgEepromCrcResponse(SenderDevId,(tMessageTypeEepromCRCResponse*)(pFrame->Data));
+          break;
+
+    case MESSAGE_TYPE_CLEAR_CODES:
+          DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_CLEAR_CODES");
+          HandleMsgEepromClearCodes();
+          break;
+
+    case MESSAGE_TYPE_ADD_CODE:
+        break;
+    case MESSAGE_TYPE_TRIGGER_CODE:
+        break;
+
+    }
+}
+
+void tKeyReciever::HandleMsgEepromCrcRequest(uint8_t SenderID)
+{
+
+  int NumOfCodes= EEPROM.read(KEY_CODE_TABLE_USAGE_OFFSET);
+  tMessageTypeEepromCRCResponse Msg;
+  Msg.NumOfActions = NumOfCodes;
+  Msg.EepromCRC = 0;    // that was pointless
+  CommSenderProcess::Instance->Enqueue(SenderID,MESSAGE_TYPE_EEPROM_CRC_RESPONSE,sizeof(Msg), &Msg);
+}
+
+void tKeyReciever::HandleMsgEepromCrcResponse(uint8_t SenderID, tMessageTypeEepromCRCResponse* Message)
+{
+    LOG_PRINT("Eeprom CRC for device ");
+    LOG(print(SenderID,HEX));
+    LOG_PRINT(" num of actions=");
+    LOG(print(Message->NumOfActions,DEC));
+    LOG_PRINT(" CRC=");
+    LOG(println(Message->EepromCRC,DEC));
+}
+
+void tKeyReciever::HandleMsgEepromClearCodes()
+{
+      EEPROM.write(KEY_CODE_TABLE_USAGE_OFFSET, 0);
 }
 
 void tKeyReciever::setTimeout()
