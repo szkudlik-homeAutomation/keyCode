@@ -44,12 +44,12 @@ void tKeyReciever::handleSensorEvent(uint16_t data, void *pData)
 
     switch (pResult->type)
     {
-    case key_type_dongle:
+    case wiegrand_key_type_dongle:
         handleCode(pResult->code, key_type_dongle);  // independent from keys - may be in the middle of key sequence
         deletePendingKeyCode();
         break;
 
-    case key_type_digit:
+    case wiegrand_key_type_digit:
         setTimeout();
         handleDigit(pResult->code);
         break;
@@ -67,14 +67,17 @@ void tKeyReciever::handleFrameRecieved(uint16_t data, void *pData)
     switch (data)   // messageType
     {
     case MESSAGE_TYPE_EEPROM_CRC_REQUEST:
-          DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_EEPROM_CRC_REQUEST");
           HandleMsgEepromCrcRequest(SenderDevId);
           break;
 #if CONFIG_DEBUG_NODE
     case MESSAGE_TYPE_EEPROM_CRC_RESPONSE:
-          DEBUG_PRINTLN_3("===================>MESSAGE_TYPE_EEPROM_CRC_RESPONSE");
           HandleMsgEepromCrcResponse(SenderDevId,(tMessageTypeEepromCRCResponse*)(pFrame->Data));
           break;
+
+    case MESSAGE_BUTTON_PRESS:
+        HandleMsgButtonPress((tMessageTypeButtonPress*)(pFrame->Data));
+        break;
+
 #endif // CONFIG_DEBUG_NODE
 
     case MESSAGE_TYPE_CLEAR_CODES:
@@ -112,6 +115,14 @@ void tKeyReciever::HandleMsgEepromCrcResponse(uint8_t SenderID, tMessageTypeEepr
     LOG_PRINT(" CRC=");
     LOG(println(Message->EepromCRC,DEC));
 }
+
+void tKeyReciever::HandleMsgButtonPress(tMessageTypeButtonPress* Msg)
+{
+    LOG_PRINT(" BUTTON PRESS short: ");
+    LOG(print(Msg->ShortClick, BIN));
+    LOG_PRINT(" long: ");
+    LOG(println(Msg->DoubleClick, BIN));
+}
 #endif CONFIG_DEBUG_NODE
 
 void tKeyReciever::setTimeout()
@@ -139,7 +150,7 @@ void tKeyReciever::deletePendingKeyCode()
 
 void tKeyReciever::sendIncorrectCodeEvent()
 {
-	DEBUG_PRINTLN_3("INCORRECT CODE - event sent");
+	LOG_PRINTLN("INCORRECT CODE - event sent");
 
 	tMessageTypeButtonPress Msg;
     Msg.DoubleClick = 0xFFFF;
@@ -151,7 +162,7 @@ void tKeyReciever::sendIncorrectCodeEvent()
 
 void tKeyReciever::sendMatchCodeEvent(tMessageTypeAddCode *pValidCode)
 {
-	DEBUG_PRINTLN_3("CODE ACCEPTED - event sent");
+	LOG_PRINTLN("CODE ACCEPTED - event sent");
 
     tMessageTypeButtonPress Msg;
     Msg.DoubleClick = 0;
@@ -181,19 +192,14 @@ void tKeyReciever::handleDigit(uint32_t code)
 		deletePendingKeyCode();
 		return;
 	}
-	uint32_t codePow = code;
-	uint8_t i = KEY_MAX_DIGITS - mDigitsCollected - 1;
-	while(i--)
-	{
-		codePow *= 10;
-	}
-	mDigitsCode += codePow;
+	mDigitsCode *= 10;
+	mDigitsCode += code;
 	mDigitsCollected++;
 }
 
 void tKeyReciever::handleCode(uint32_t code, uint8_t type)
 {
-    DEBUG_PRINT_3("Processing code type");
+    DEBUG_PRINT_3("Processing code type: ");
     DEBUG_3(print(type, DEC));
     DEBUG_PRINT_3(" value: ");
     DEBUG_3(print(code, DEC));
@@ -206,8 +212,19 @@ void tKeyReciever::handleCode(uint32_t code, uint8_t type)
     {
         for (uint8_t i = 0; i < NumOfEnties; i++)
         {
+            DEBUG_PRINT_2("Check entry ");
+            DEBUG_2(println(i, DEC));
+
             tMessageTypeAddCode ValidCode;
             EEPROM.get(KEY_CODE_TABLE_OFFSET+(KEY_CODE_TABLE_SIZE*i),ValidCode);
+
+            DEBUG_PRINT_2("Entry type ");
+            DEBUG_2(print(ValidCode.type, DEC));
+            DEBUG_PRINT_2(" value: ");
+            DEBUG_2(print(ValidCode.code, DEC));
+            DEBUG_PRINT_2(" 0x");
+            DEBUG_2(println(ValidCode.code, HEX));
+
             if (ValidCode.type != type)
                 continue;
             if (ValidCode.code != code)
@@ -234,9 +251,22 @@ void tKeyReciever::handleCode(uint32_t code, uint8_t type)
 
 void tKeyReciever::HandleMsgAddCode(uint8_t SenderDevId, tMessageTypeAddCode *Msg)
 {
-    DEBUG_PRINT_3("Adding code type");
+    uint8_t NumOfEnties = EEPROM.read(KEY_CODE_TABLE_USAGE_OFFSET);
+
+    if (NumOfEnties >= KEY_CODE_TABLE_SIZE)
+    {
+        // out of eeprom
+        DEBUG_PRINT_3("Out of eeprom: ");
+        DEBUG_3(println(NumOfEnties, DEC));
+        tOutgoingFrames::SendMsgStatus(SenderDevId, STATUS_OUT_OF_MEMORY);
+        return;
+    }
+
+    DEBUG_PRINT_3("Adding code at slot ");
+    DEBUG_3(println(NumOfEnties, DEC));
+    DEBUG_PRINT_3("   type");
     DEBUG_3(print(Msg->type, DEC));
-    DEBUG_PRINT_3(" value: ");
+    DEBUG_PRINT_3("   value: ");
     DEBUG_3(print(Msg->code, DEC));
     DEBUG_PRINT_3(" 0x");
     DEBUG_3(println(Msg->code, HEX));
@@ -247,15 +277,8 @@ void tKeyReciever::HandleMsgAddCode(uint8_t SenderDevId, tMessageTypeAddCode *Ms
     DEBUG_PRINT_3("  MessageKeyMap: ");
     DEBUG_3(println(Msg->ButtonBitmap, BIN));
 
-    uint8_t NumOfEnties = EEPROM.read(KEY_CODE_TABLE_USAGE_OFFSET);
 
-    if (KEY_CODE_TABLE_SIZE >= NumOfEnties)
-    {
-        // out of eeprom
-        tOutgoingFrames::SendMsgStatus(SenderDevId, STATUS_OUT_OF_MEMORY);
-        return;
-    }
-    EEPROM.get(KEY_CODE_TABLE_OFFSET+(KEY_CODE_TABLE_SIZE*NumOfEnties),Msg);
+    EEPROM.put(KEY_CODE_TABLE_OFFSET+(KEY_CODE_TABLE_SIZE*NumOfEnties),*Msg);
 
     NumOfEnties++;
     EEPROM.write(KEY_CODE_TABLE_USAGE_OFFSET, NumOfEnties);

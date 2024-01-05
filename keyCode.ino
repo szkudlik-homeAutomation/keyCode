@@ -66,7 +66,7 @@ void setup() {
   COMM_SERIAL.begin(9600);
   while (!COMM_SERIAL);
 
-#if CONFIG_TLE8457_COMM_LIB
+#if CONFIG_TLE8457_COMM_LIB 
   CommSender.add();
   CommReciever.add();
 #endif //CONFIG_TLE8457_COMM_LIB
