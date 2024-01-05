@@ -26,7 +26,7 @@ const commandList_t TelnetCommands[] = {
   {"GetEepromCrc",    send_GetEepromCrc,            "GetEepromCrc dev_id"},
   {"ClearCodes",      send_ClearCodes,              "ClearCodes dev_id"},
   {"AddCode",		send_addCode, "AddCode dev_id type code ButtonBitmap"},
-  {"TriggerCode",	send_triggerCode, "dev_id type code"},
+  {"TriggerCode",	send_triggerCode, "TriggerCode dev_id type code"},
 #endif //CONFIG_TLE8457_COMM_LIB
 };
 
