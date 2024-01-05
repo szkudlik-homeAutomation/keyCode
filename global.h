@@ -62,7 +62,7 @@
 #define CONFIG_WIEGAND_D1_PIN 3
 #define CONFIG_KEYCODE_TIMEOUT 2500
 
-#define CONFIG_TIMESTAMP 1
+#define CONFIG_TIMESTAMP 0
 
 #include <Arduino.h>
 #include "src/Common_code/helpers.h"

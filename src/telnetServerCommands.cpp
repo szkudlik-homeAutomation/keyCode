@@ -25,7 +25,7 @@ const commandList_t TelnetCommands[] = {
   {"Reset",           send_Reset,                   "reset the system"},
   {"GetEepromCrc",    send_GetEepromCrc,            "GetEepromCrc dev_id"},
   {"ClearCodes",      send_ClearCodes,              "ClearCodes dev_id"},
-  {"AddCode",		send_addCode, "AddCode dev_id type code ButtonBitmap [validStart validEnd]"},
+  {"AddCode",		send_addCode, "AddCode dev_id type code ButtonBitmap"},
   {"TriggerCode",	send_triggerCode, "dev_id type code"},
 #endif //CONFIG_TLE8457_COMM_LIB
 };
@@ -65,11 +65,11 @@ bool send_addCode(Commander &Cmdr)
     if(! Cmdr.getInt(ButtonBitmap))
         goto error;
 
-    if(! Cmdr.getInt(validStart))
-        goto finish;
-    if(! Cmdr.getInt(validEnd))
-        goto error;
-
+//    if(! Cmdr.getInt(validStart))
+//        goto finish;
+//    if(! Cmdr.getInt(validEnd))
+//        goto error;
+//
   finish:
     tMessageTypeAddCode Msg;
     Msg.code = code;
@@ -83,11 +83,11 @@ bool send_addCode(Commander &Cmdr)
     return true;
 
   error:
-        Cmdr.println(F("Usage: AddCode dev_id type code ButtonBitmap [validStart validEnd]"));
+        Cmdr.println(F("Usage: AddCode dev_id type code ButtonBitmap"));
         Cmdr.println(F("   type 0 - a dongle, 1 - keySequence"));
         Cmdr.println(F("   code a code in binary format"));
         Cmdr.println(F("   ButtonBitmap bitmap of simulated key Press when code is accepted"));
-        Cmdr.println(F("   [validStart validEnd] timestamps from-to the code is valid"));
+//        Cmdr.println(F("   [validStart validEnd] timestamps from-to the code is valid"));
         return false;
 }
 

@@ -230,17 +230,17 @@ void tKeyReciever::handleCode(uint32_t code, uint8_t type)
             if (ValidCode.code != code)
                 continue;
 
-            if (ValidCode.ValidStart && ValidCode.ValidEnd)
-            {
-                uint16_t ts = tTimestamp::get();
-                ts = ts >> 8;   // eldest 8 bits
-
-                if (ValidCode.ValidStart > ts)
-                    continue;
-                if (ValidCode.ValidEnd < ts)
-                    continue;
-            }
-
+//            if (ValidCode.ValidStart && ValidCode.ValidEnd)
+//            {
+//                uint16_t ts = tTimestamp::get();
+//                ts = ts >> 8;   // eldest 8 bits
+//
+//                if (ValidCode.ValidStart > ts)
+//                    continue;
+//                if (ValidCode.ValidEnd < ts)
+//                    continue;
+//            }
+//
             sendMatchCodeEvent(&ValidCode);
             return;
         }
@@ -270,10 +270,10 @@ void tKeyReciever::HandleMsgAddCode(uint8_t SenderDevId, tMessageTypeAddCode *Ms
     DEBUG_3(print(Msg->code, DEC));
     DEBUG_PRINT_3(" 0x");
     DEBUG_3(println(Msg->code, HEX));
-    DEBUG_PRINT_3("  Valid start: ");
-    DEBUG_3(print(Msg->ValidStart, DEC));
-    DEBUG_PRINT_3("valid end: ");
-    DEBUG_3(println(Msg->ValidEnd, DEC));
+//    DEBUG_PRINT_3("  Valid start: ");
+//    DEBUG_3(print(Msg->ValidStart, DEC));
+//    DEBUG_PRINT_3(" valid end: ");
+//    DEBUG_3(println(Msg->ValidEnd, DEC));
     DEBUG_PRINT_3("  MessageKeyMap: ");
     DEBUG_3(println(Msg->ButtonBitmap, BIN));
 
