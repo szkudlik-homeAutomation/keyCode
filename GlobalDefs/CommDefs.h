@@ -117,7 +117,6 @@ typedef struct
                             // NOTE - for backward compatibility with LightControl, where messages are 8 bytes long, bitmap must be shortened to 8 bits
 } tMessageTypeAddCode;
 C_ASSERT(sizeof(tMessageTypeAddCode) <= COMMUNICATION_PAYLOAD_DATA_SIZE);
-
 #define MESSAGE_TYPE_ADD_CODE 0x81
 
 /**
@@ -129,5 +128,15 @@ typedef struct
 	uint32_t code;		// a code in binary format
 } tMessageTypeTriggerCode;
 C_ASSERT(sizeof(tMessageTypeTriggerCode) <= COMMUNICATION_PAYLOAD_DATA_SIZE);
-
 #define MESSAGE_TYPE_TRIGGER_CODE 0x82
+
+/**
+ * code recieved - an event, to retrieve all codes. Sent as a broadcast
+ */
+typedef struct
+{
+	uint8_t type;		// code type, 0 - a dongle, 1 - keySequence
+	uint32_t code;		// a code in binary format
+} tMessageTypeCodeRecieved;
+C_ASSERT(sizeof(tMessageTypeCodeRecieved) <= COMMUNICATION_PAYLOAD_DATA_SIZE);
+#define MESSAGE_TYPE_CODE_RECIEVED 0x83

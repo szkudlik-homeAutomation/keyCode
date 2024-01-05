@@ -38,6 +38,7 @@ private:
 #if CONFIG_DEBUG_NODE
    void HandleMsgEepromCrcResponse(uint8_t SenderID, tMessageTypeEepromCRCResponse* Message);
    void HandleMsgButtonPress(tMessageTypeButtonPress* Msg);
+   void HandleMsgCodeRecieved(tMessageTypeCodeRecieved *Msg);
 #endif CONFIG_DEBUG_NODE
 
    void HandleMsgEepromClearCodes();

@@ -78,6 +78,10 @@ void tKeyReciever::handleFrameRecieved(uint16_t data, void *pData)
         HandleMsgButtonPress((tMessageTypeButtonPress*)(pFrame->Data));
         break;
 
+    case MESSAGE_TYPE_CODE_RECIEVED:
+        HandleMsgCodeRecieved((tMessageTypeCodeRecieved*)(pFrame->Data));
+        break;
+
 #endif // CONFIG_DEBUG_NODE
 
     case MESSAGE_TYPE_CLEAR_CODES:
@@ -122,6 +126,16 @@ void tKeyReciever::HandleMsgButtonPress(tMessageTypeButtonPress* Msg)
     LOG(print(Msg->ShortClick, BIN));
     LOG_PRINT(" long: ");
     LOG(println(Msg->DoubleClick, BIN));
+}
+
+void tKeyReciever::HandleMsgCodeRecieved(tMessageTypeCodeRecieved *Msg)
+{
+    LOG_PRINT(" Code recieved, type: ");
+    LOG(print(Msg->type, DEC));
+    LOG_PRINT(" value: ");
+    LOG(print(Msg->code, DEC));
+    LOG_PRINT(" 0x");
+    LOG(println(Msg->code, HEX));
 }
 #endif CONFIG_DEBUG_NODE
 
@@ -205,6 +219,12 @@ void tKeyReciever::handleCode(uint32_t code, uint8_t type)
     DEBUG_3(print(code, DEC));
     DEBUG_PRINT_3(" 0x");
     DEBUG_3(println(code, HEX));
+
+    tMessageTypeCodeRecieved Msg;
+    Msg.code = code;
+    Msg.type = type;
+
+    CommSenderProcess::Instance->Enqueue(DEVICE_ID_BROADCAST,MESSAGE_TYPE_CODE_RECIEVED,sizeof(Msg),&Msg);
 
     uint8_t NumOfEnties = EEPROM.read(KEY_CODE_TABLE_USAGE_OFFSET);
 
