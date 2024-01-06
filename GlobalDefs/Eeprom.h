@@ -18,7 +18,6 @@ typedef struct __tEeprom
   uint8_t DNS[4];
   uint8_t MAC[6];
 #endif CONFIG_NETWORK
-  uint8_t MinKeycodeLength;
   uint8_t KeyCodeUsage;
   tMessageTypeAddCode KeyCode[KEY_CODE_TABLE_SIZE];
 };
@@ -35,7 +34,6 @@ typedef struct __tEeprom
 #define EEPROM_MAC offsetof(__tEeprom,MAC[0])
 #endif //CONFIG_NETWORK
 
-#define MIN_KEYCODE_LEN_OFFSET offsetof(__tEeprom,MinKeycodeLength)
 #define KEY_CODE_TABLE_USAGE_OFFSET offsetof(__tEeprom,KeyCodeUsage)
 #define KEY_CODE_TABLE_OFFSET offsetof(__tEeprom,KeyCode[0])
 #define KEY_CODE_TABLE_SIZE sizeof(tMessageTypeAddCode)
