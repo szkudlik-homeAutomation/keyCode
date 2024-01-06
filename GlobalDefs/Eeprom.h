@@ -5,10 +5,7 @@
 
 #define EEPROM_CANNARY 0xA0     // change if update changes EEPROM structure
 
-#define KEY_CODE_BYTE_SIZE ((KEY_CODE_BIT_SIZE + 1) / 8)
-#define KEY_CODE_TABLE_SIZE 50	// TODO - calculate
-
-
+#define KEY_CODE_TABLE_SIZE 100 // eeprom size is 1024 (atmega 328)
 
 typedef struct __tEeprom
 {
