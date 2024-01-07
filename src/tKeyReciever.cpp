@@ -46,7 +46,6 @@ void tKeyReciever::handleSensorEvent(uint16_t data, void *pData)
     {
     case wiegrand_key_type_dongle:
         handleCode(pResult->code, key_type_dongle);  // independent from keys - may be in the middle of key sequence
-        deletePendingKeyCode();
         break;
 
     case wiegrand_key_type_digit:
@@ -159,7 +158,7 @@ void tKeyReciever::deletePendingKeyCode()
 {
 	deleteTimeout();
 	mDigitsCollected = 0;
-	mDigitsCode = 0;
+	mDigitsCode = 1;	// always 1 on front, to distinguish betwen 123 and 0123 ==> 1123 1023
 }
 
 void tKeyReciever::sendIncorrectCodeEvent()
