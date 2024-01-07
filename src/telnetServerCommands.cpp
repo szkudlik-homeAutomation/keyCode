@@ -53,6 +53,7 @@ bool send_addCode(Commander &Cmdr)
     int Dst;
     int type;
     uint32_t code;
+    uint8_t codeDigits;
     int ButtonBitmap;
     int validStart = 0;
     int validEnd = 0;
@@ -60,7 +61,7 @@ bool send_addCode(Commander &Cmdr)
         goto error;
     if(! Cmdr.getInt(type))
         goto error;
-    if(! Cmdr.getLong(code))
+    if(! Cmdr.getLong(code, &codeDigits))
         goto error;
     if(! Cmdr.getInt(ButtonBitmap))
         goto error;
@@ -73,7 +74,10 @@ bool send_addCode(Commander &Cmdr)
   finish:
     tMessageTypeAddCode Msg;
     Msg.code = code;
-    Msg.type = type;
+    if (type)
+    	Msg.size = codeDigits;
+    else
+    	Msg.size = 0;
     Msg.ValidEnd = validEnd;
     Msg.ValidStart = validStart;
     Msg.ButtonBitmap = ButtonBitmap;
@@ -95,17 +99,22 @@ bool send_triggerCode(Commander &Cmdr)
 {
 	  int Dst;
 	  int type;
-	  int code;
+	  uint32_t code;
+	  uint8_t codeDigits;
+
 	  if(! Cmdr.getInt(Dst))
 		  goto error;
 	  if(! Cmdr.getInt(type))
 		  goto error;
-	  if(! Cmdr.getInt(code))
+	  if(! Cmdr.getLong(code, &codeDigits))
 		  goto error;
 
 	  tMessageTypeTriggerCode Msg;
+	    if (type)
+	    	Msg.size = codeDigits;
+	    else
+	    	Msg.size = 0;
 	  Msg.code = code;
-	  Msg.type = type;
 	  CommSenderProcess::Instance->Enqueue(Dst,MESSAGE_TYPE_TRIGGER_CODE,sizeof(Msg),&Msg);
 	  return true;
 

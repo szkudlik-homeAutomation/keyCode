@@ -45,7 +45,7 @@ void tKeyReciever::handleSensorEvent(uint16_t data, void *pData)
     switch (pResult->type)
     {
     case wiegrand_key_type_dongle:
-        handleCode(pResult->code, key_type_dongle);  // independent from keys - may be in the middle of key sequence
+        handleCode(pResult->code, 0);  // independent from keys - may be in the middle of key sequence
         break;
 
     case wiegrand_key_type_digit:
@@ -129,8 +129,8 @@ void tKeyReciever::HandleMsgButtonPress(tMessageTypeButtonPress* Msg)
 
 void tKeyReciever::HandleMsgCodeRecieved(tMessageTypeCodeRecieved *Msg)
 {
-    LOG_PRINT(" Code recieved, type: ");
-    LOG(print(Msg->type, DEC));
+    LOG_PRINT(" Code recieved, size: ");
+    LOG(print(Msg->size, DEC));
     LOG_PRINT(" value: ");
     LOG(print(Msg->code, DEC));
     LOG_PRINT(" 0x");
@@ -158,7 +158,7 @@ void tKeyReciever::deletePendingKeyCode()
 {
 	deleteTimeout();
 	mDigitsCollected = 0;
-	mDigitsCode = 1;	// always 1 on front, to distinguish betwen 123 and 0123 ==> 1123 1023
+	mDigitsCode = 0;
 }
 
 void tKeyReciever::sendIncorrectCodeEvent()
@@ -195,7 +195,7 @@ void tKeyReciever::handleDigit(uint32_t code)
 	}
 	if (code == 0xD)
 	{
-	    handleCode(mDigitsCode, key_type_digit);
+	    handleCode(mDigitsCode, mDigitsCollected);
 		deletePendingKeyCode();
 		return;
 	}
@@ -210,10 +210,10 @@ void tKeyReciever::handleDigit(uint32_t code)
 	mDigitsCollected++;
 }
 
-void tKeyReciever::handleCode(uint32_t code, uint8_t type)
+void tKeyReciever::handleCode(uint32_t code, uint8_t size)
 {
-    DEBUG_PRINT_3("Processing code type: ");
-    DEBUG_3(print(type, DEC));
+    DEBUG_PRINT_3("Processing code size: ");
+    DEBUG_3(print(size, DEC));
     DEBUG_PRINT_3(" value: ");
     DEBUG_3(print(code, DEC));
     DEBUG_PRINT_3(" 0x");
@@ -221,7 +221,7 @@ void tKeyReciever::handleCode(uint32_t code, uint8_t type)
 
     tMessageTypeCodeRecieved Msg;
     Msg.code = code;
-    Msg.type = type;
+    Msg.size = size;
 
     CommSenderProcess::Instance->Enqueue(DEVICE_ID_BROADCAST,MESSAGE_TYPE_CODE_RECIEVED,sizeof(Msg),&Msg);
 
@@ -237,14 +237,14 @@ void tKeyReciever::handleCode(uint32_t code, uint8_t type)
             tMessageTypeAddCode ValidCode;
             EEPROM.get(KEY_CODE_TABLE_OFFSET+(KEY_CODE_TABLE_SIZE*i),ValidCode);
 
-            DEBUG_PRINT_2("Entry type ");
-            DEBUG_2(print(ValidCode.type, DEC));
+            DEBUG_PRINT_2("Entry size ");
+            DEBUG_2(print(ValidCode.size, DEC));
             DEBUG_PRINT_2(" value: ");
             DEBUG_2(print(ValidCode.code, DEC));
             DEBUG_PRINT_2(" 0x");
             DEBUG_2(println(ValidCode.code, HEX));
 
-            if (ValidCode.type != type)
+            if (ValidCode.size != size)
                 continue;
             if (ValidCode.code != code)
                 continue;
@@ -283,8 +283,8 @@ void tKeyReciever::HandleMsgAddCode(uint8_t SenderDevId, tMessageTypeAddCode *Ms
 
     DEBUG_PRINT_3("Adding code at slot ");
     DEBUG_3(println(NumOfEnties, DEC));
-    DEBUG_PRINT_3("   type");
-    DEBUG_3(print(Msg->type, DEC));
+    DEBUG_PRINT_3("   size: ");
+    DEBUG_3(print(Msg->size, DEC));
     DEBUG_PRINT_3("   value: ");
     DEBUG_3(print(Msg->code, DEC));
     DEBUG_PRINT_3(" 0x");
@@ -305,7 +305,7 @@ void tKeyReciever::HandleMsgAddCode(uint8_t SenderDevId, tMessageTypeAddCode *Ms
 
 void tKeyReciever::HandleMsgTriggerCode(tMessageTypeTriggerCode *Msg)
 {
-    handleCode(Msg->code, Msg->type);
+    handleCode(Msg->code, Msg->size);
 }
 
 void tKeyReciever::HandleMsgEepromClearCodes()

@@ -107,7 +107,7 @@ C_ASSERT(sizeof(tMessageTypeDefaultTimerResponse) <= COMMUNICATION_PAYLOAD_DATA_
  */
 typedef struct
 {
-	uint8_t type;		// code type, 0 - a dongle, 1 - keySequence
+	uint8_t size;		// code size, 0 - a dongle, otherwise - number of digits
 	uint32_t code;		// a code in binary format
 
 	uint8_t ValidStart;	    // valid only between start-end. If 0 - valid always.
@@ -124,7 +124,7 @@ C_ASSERT(sizeof(tMessageTypeAddCode) <= COMMUNICATION_PAYLOAD_DATA_SIZE);
  */
 typedef struct
 {
-	uint8_t type;		// code type, 0 - a dongle, 1 - keySequence
+	uint8_t size;		// code size, 0 - a dongle, otherwise - number of digits
 	uint32_t code;		// a code in binary format
 } tMessageTypeTriggerCode;
 C_ASSERT(sizeof(tMessageTypeTriggerCode) <= COMMUNICATION_PAYLOAD_DATA_SIZE);
@@ -135,7 +135,7 @@ C_ASSERT(sizeof(tMessageTypeTriggerCode) <= COMMUNICATION_PAYLOAD_DATA_SIZE);
  */
 typedef struct
 {
-	uint8_t type;		// code type, 0 - a dongle, 1 - keySequence
+	uint8_t size;		// code size, 0 - a dongle, otherwise - number of digits
 	uint32_t code;		// a code in binary format
 } tMessageTypeCodeRecieved;
 C_ASSERT(sizeof(tMessageTypeCodeRecieved) <= COMMUNICATION_PAYLOAD_DATA_SIZE);

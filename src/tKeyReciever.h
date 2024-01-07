@@ -47,13 +47,11 @@ private:
 
    static const uint8_t wiegrand_key_type_digit = 4;
    static const uint8_t wiegrand_key_type_dongle = 34;
-   static const uint8_t key_type_dongle = 0;
-   static const uint8_t key_type_digit = 1;
    void setTimeout();
    void deletePendingKeyCode();
    void deleteTimeout() { disable(); }
 
-   void handleCode(uint32_t code, uint8_t type);
+   void handleCode(uint32_t code, uint8_t size);
    void handleDigit(uint32_t code);
 
    void sendIncorrectCodeEvent();
