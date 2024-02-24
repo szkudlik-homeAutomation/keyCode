@@ -42,3 +42,5 @@
  * calculate it based on baud rate and frame size
  */
 #define FRAME_TRANSMISSION_TIME 20
+
+#define TRANSMISSION_SPEED 9600
